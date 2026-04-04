@@ -5,7 +5,7 @@ import pytest
 import pytest_asyncio
 import valkey.asyncio as valkey
 from tests.conftest import skip_if_server_version_lt
-from valkey._parsers.url_parser import to_bool
+from valkey._parsers.url_parser import _to_bool
 from valkey.asyncio.connection import Connection, DefaultParser
 from valkey.utils import SSL_AVAILABLE
 
@@ -395,9 +395,7 @@ class TestConnectionPoolURLParsing:
 
     def test_boolean_parsing(self):
         for expected, value in (
-            (None, None),
             (None, ""),
-            (False, 0),
             (False, "0"),
             (False, "f"),
             (False, "F"),
@@ -405,13 +403,12 @@ class TestConnectionPoolURLParsing:
             (False, "n"),
             (False, "N"),
             (False, "No"),
-            (True, 1),
             (True, "1"),
             (True, "y"),
             (True, "Y"),
             (True, "Yes"),
         ):
-            assert expected is to_bool(value)
+            assert expected is _to_bool(value)
 
     def test_client_name_in_querystring(self):
         pool = valkey.ConnectionPool.from_url(
